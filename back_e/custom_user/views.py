@@ -12,8 +12,7 @@ from .models import UserAction,UserFeedback,ContactForm,UserVerification
 from decouple import config
 import requests
 from django.conf import settings
-from notification.utils import create_welcome_notification
-from tools.report_email import welcome_notification_email,send_verification_email,website_action_message,forward_contact_message,send_downtimenote_payment_email
+from tools.client_email import welcome_notification_email,send_verification_email,website_action_message,forward_contact_message
 from django.utils import timezone
 from datetime import timedelta
 from tools.validators import generate_verification_code
