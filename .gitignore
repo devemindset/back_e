@@ -1,0 +1,4 @@
+/venv
+/back_e/.env
+/back_e/db.sqlite3
+/back_e/media
