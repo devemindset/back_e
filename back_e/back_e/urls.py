@@ -24,6 +24,9 @@ urlpatterns = [
     path('royile_e_koly/', admin.site.urls),
     path("user/",include("custom_user.urls")),
     path("payment/",include("payment.urls")),
+    path("products/",include("products.urls")),
+    path("cart/",include("cart.urls")),
+    path("orders/",include("orders.urls")),
 ]
 
 if settings.DEBUG:

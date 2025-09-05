@@ -4,11 +4,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model,logout,login as auth_login
-from .serializers import CustomUserSerializer,RegisterSerializer,LoginSerializer,GoogleAuthSerializer,UserFeedbackSerializer,EmailSerializer,BeforeRegisterSerializer
+from .serializers import CustomUserSerializer,RegisterSerializer,LoginSerializer,GoogleAuthSerializer,UserFeedbackSerializer,EmailSerializer,BeforeRegisterSerializer,CustomerInfoSerializer
 from django.middleware.csrf import get_token
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import UserAction,UserFeedback,ContactForm,UserVerification
+from .models import UserAction,UserFeedback,ContactForm,UserVerification,CustomerInfo
 from decouple import config
 import requests
 from django.conf import settings
@@ -421,3 +421,21 @@ contact_form = ContactFormView.as_view()
 
 
 
+class CustomerInfoAPIView(APIView):
+    def post(self, request):
+        serializer = CustomerInfoSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data["email"]
+        full_name = serializer.validated_data.get("full_name", "")
+        phone = serializer.validated_data.get("phone", "")
+
+        try:
+            CustomerInfo.objects.create(
+                email=email,phone=phone, full_name=full_name
+            )
+            
+            return Response({"message" : "success"}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

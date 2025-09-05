@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import CustomUser,UserSubscription,UserVerification
+from .models import CustomUser,UserVerification,CustomerInfo
 from django.contrib.auth import get_user_model, login as auth_login, authenticate
-from projects.serializers import ProjectLightSerializer
+
 
 
 
@@ -130,3 +130,12 @@ class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     message = serializers.CharField(required=True,max_length=1000)
     recaptcha_token = serializers.CharField(required=True)
+
+class CustomerInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerInfo
+        fields = [
+            "email",
+            "full_name",
+            "phone",
+        ]

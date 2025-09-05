@@ -59,6 +59,9 @@ INSTALLED_APPS = [
     "payment",
     'django_celery_beat',
     "anymail",
+    "products",
+    "cart",
+    "orders",
 
 
 ]

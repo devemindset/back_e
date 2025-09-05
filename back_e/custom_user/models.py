@@ -72,6 +72,16 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     class Meta:
         ordering = ("created_at",)
 
+class CustomerInfo(models.Model):
+    email = models.EmailField(unique=True)  # Évite les doublons pour l'email marketing
+    full_name = models.CharField(max_length=100, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)  # Optionnel
+    created_at = models.DateTimeField(auto_now_add=True)  # Pour savoir quand le client est arrivé
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.email} - {self.full_name}"
+
 class UserVerification(models.Model):
     username=models.CharField(max_length=20)
     email=models.EmailField()
