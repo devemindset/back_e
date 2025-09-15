@@ -226,15 +226,15 @@ if DEBUG:
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
-        config("DOWNTIMENOTE_URL_FRONT"),
-        config("DOWNTIMENOTE_URL_FRONT_WWW"),
+        config("DROP_URL_FRONT"),
+        config("DROP_URL_FRONT_WWW"),
         
     ]
 
     CSRF_TRUSTED_ORIGINS = [
-        config("DOWNTIMENOTE_URL_FRONT"),
-        config("DOWNTIMENOTE_URL_BACKEND"),
-        config("DOWNTIMENOTE_URL_FRONT_WWW"),
+        config("DROP_URL_FRONT"),
+        config("DROP_URL_BACKEND"),
+        config("DROP_URL_FRONT_WWW"),
 
         
     ]
@@ -296,19 +296,19 @@ STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 
 # CELERY_BEAT_SCHEDULE_FILENAME = os.environ.get("CELERY_BEAT_SCHEDULE_FILENAME", "celerybeat-schedule")
 
-CUSTOM_DOMAIN_SECRET=config("CUSTOM_DOMAIN_SECRET")
+
 
 # email settings 
 
 EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
 
-ANYMAIL = {
-    "SENDGRID_API_KEY": config("SENDGRID_API_KEY"),
-}
+# ANYMAIL = {
+#     "SENDGRID_API_KEY": config("SENDGRID_API_KEY"),
+# }
 
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+# DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
-CONTACT_RECEIVER_EMAIL=config("CONTACT_RECEIVER_EMAIL")
+# CONTACT_RECEIVER_EMAIL=config("CONTACT_RECEIVER_EMAIL")
 
 
 REST_FRAMEWORK = {

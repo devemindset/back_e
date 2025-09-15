@@ -12,6 +12,7 @@ class Order(models.Model):
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    session_id = models.CharField(max_length=255, blank=True, null=True,unique=True)  # Pour visiteurs non connectés
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
     address = models.TextField()

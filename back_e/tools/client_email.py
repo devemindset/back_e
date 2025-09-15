@@ -1,8 +1,8 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
-DEFAULT_FROM_EMAIL= settings.DEFAULT_FROM_EMAIL
-CONTACT_RECEIVER_EMAIL= settings.CONTACT_RECEIVER_EMAIL
+DEFAULT_FROM_EMAIL=""
+CONTACT_RECEIVER_EMAIL= ""
 
 def welcome_notification_email(receiver_email):
     subject = "Welcome to DowntimeNote 🎉"
@@ -102,7 +102,7 @@ def send_verification_email(email, code):
   
     
     subject = "Verify your DowntimeNote account"
-    from_email = settings.DEFAULT_FROM_EMAIL
+    from_email = ""
     to = [email]
     text_content = f"Your verification code is: {code}"
 
@@ -194,7 +194,7 @@ def website_action_message(type, place):
 
 def send_downtimenote_payment_email(email, amount):
     subject = "Your Payment Receipt – DowntimeNote"
-    from_email = settings.DEFAULT_FROM_EMAIL
+    from_email = ""
     to = [email]
 
     text_content = f"Thanks for your payment of ${amount:.2f}. Your DowntimeNote subscription has been activated."
