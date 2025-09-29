@@ -7,5 +7,5 @@ class AdminOrder(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class AdminOrderItem(admin.ModelAdmin):
-    list_display = ("order","product","quantity","price",)
+    list_display = ("order","product_category","quantity","price",)
 

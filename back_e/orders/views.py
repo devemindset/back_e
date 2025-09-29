@@ -26,6 +26,7 @@ class OrderAPIView(APIView):
         items = serializer.validated_data["items"]
         phonenumber = serializer.validated_data["phonenumber"]
         user = serializer.validated_data.get("user", None)
+        session_id = serializer.validated_data.get("session_id",None)
 
         try:
             order = Order.objects.create(
@@ -35,12 +36,13 @@ class OrderAPIView(APIView):
                 total_amount=total_amount,
                 phonenumber=phonenumber,
                 user=user,
+                session_id = session_id,
             )
 
             for item in items:
                 OrderItem.objects.create(
                     order=order,
-                    product=item["product"],
+                    product_category=item["product_category"],
                     quantity=item["quantity"],
                     price=item["product"].price
                 )

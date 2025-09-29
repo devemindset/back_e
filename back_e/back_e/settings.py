@@ -265,6 +265,7 @@ else:
 #stripe config
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 
+FRONTEND_URL = config("FRONTEND_URL")
 
 
 # CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")

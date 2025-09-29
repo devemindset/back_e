@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CartAPIView,CartItemAPIView
+from .views import CartAPIView,CartItemAPIView,ClearCartView
 
 urlpatterns = [
     path('create_cart/', CartAPIView.as_view()),                  # POST créer panier
@@ -7,5 +7,6 @@ urlpatterns = [
     path('<str:session_id>/', CartAPIView.as_view()),    # GET panier
     # path('cartitem/<int:cart_id>/', CartItemAPIView.as_view()),  # GET items du panier
     path('cartitem/<int:cart_item_id>/', CartItemAPIView.as_view()),  # DELETE items du panier
+    path("clear/<str:session_id>/", ClearCartView.as_view(), name="clear-cart"),
 
 ]

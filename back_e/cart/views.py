@@ -69,3 +69,16 @@ class CartItemAPIView(APIView):
             return Response({"error": "Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ClearCartView(APIView):
+    """
+    Supprime le panier par session_id.
+    """
+    def delete(self, request, session_id):
+        try:
+            cart = Cart.objects.get(session_id=session_id)
+            cart.delete()  # ⚡ supprime aussi les CartItem liés via on_delete=models.CASCADE
+            return Response(status=status.HTTP_204_NO_CONTENT)  # ✅ No Content
+        except Cart.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
