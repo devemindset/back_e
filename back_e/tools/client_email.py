@@ -1,238 +1,116 @@
+# payment/emails.py
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from django.template.loader import render_to_string
 
-DEFAULT_FROM_EMAIL=""
-CONTACT_RECEIVER_EMAIL= ""
-
-def welcome_notification_email(receiver_email):
-    subject = "Welcome to DowntimeNote 🎉"
-    from_email = DEFAULT_FROM_EMAIL
-    to = [receiver_email]
-    text_content = "Welcome to DowntimeNote!"
-
-    html_content = """
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Welcome to DowntimeNote</title>
-</head>
-<body style="font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f5f7fb; padding: 30px; color: #333;">
-  <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
-    <tr>
-      <td style="padding: 30px;">
-        <h1 style="color: #2c3e50; font-size: 26px; margin-bottom: 10px;">👋 Welcome to DowntimeNote</h1>
-        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-          Thanks for signing up! We're excited to have you on board.
-        </p>
-        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-          You can now create your first project, connect your website, and let us take care of monitoring uptime, SSL certificates, cronjobs, and SEO — automatically.
-        </p>
-        
-        <p style="font-size: 14px; color: #777; margin-top: 40px;">
-          This is an automated email. Please do not reply.
-        </p>
-        <p style="font-size: 16px; margin-top: 10px;">– The DowntimeNote Team</p>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-"""
-
-
-    msg = EmailMultiAlternatives(
-        subject,
-        text_content,
-        from_email,
-        to,
-        # headers={"Reply-To": "no-reply@downtimenote.com"}  # facultatif
-    )
+# Utilitaire pour envoyer un email HTML
+def send_html_email(subject, to_email, html_content, text_content=None):
+    from_email = settings.DEFAULT_FROM_EMAIL 
+    msg = EmailMultiAlternatives(subject, text_content or "", from_email, [to_email])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-def forward_contact_message(user_email, user_message):
-    """
-    Transfère un message de contact vers ton adresse support avec version HTML.
-    """
-    subject = f"📩 Nouveau message de {user_email}"
-    from_email = DEFAULT_FROM_EMAIL
-    to = ["gogmongoma@gmail.com"]
 
-    # ✅ Version texte brut (fallback)
+def send_payment_confirmation_to_client(order):
+    """
+    Send a beautiful confirmation email to the client after payment.
+    """
+    subject = f"Thank you for your order #{order.id} – Goldy Seas"
+    client_name = order.full_name.split(" ")[0] if order.full_name else "Dear Customer"
+
+    html_content = f"""
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fb; padding: 40px 0;">
+      <div style="max-width: 600px; background: white; border-radius: 10px; overflow: hidden; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(90deg, #d4af37, #f5d76e); padding: 20px 30px; color: white; text-align: center;">
+          <h1 style="margin: 0; font-size: 26px; letter-spacing: 1px;">Goldy Seas</h1>
+        </div>
+
+        <div style="padding: 30px;">
+          <h2 style="color: #333;">Hi {client_name},</h2>
+          <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            We’re thrilled to confirm that we’ve <strong>successfully received your payment</strong> for 
+            <strong>Order #{order.id}</strong>.
+          </p>
+          <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            Our team is now preparing your items for shipment. You’ll receive an update once your order is on its way.
+          </p>
+
+          <div style="background-color: #faf3dd; border-left: 4px solid #d4af37; padding: 15px 20px; margin: 25px 0;">
+            <p style="margin: 0; color: #6b5e3c; font-size: 15px;">
+              Need help or have questions? Contact us anytime at 
+              <a href="mailto:gold@goldyseas.com" style="color: #d4af37; text-decoration: none;">gold@goldyseas.com</a>.
+            </p>
+          </div>
+
+          <p style="font-size: 16px; color: #555;">Thank you for choosing <strong>Goldy Seas</strong> – your trust means the world to us.</p>
+
+          <p style="margin-top: 35px; color: #999; font-size: 14px; text-align: center;">
+            © Goldy Seas {order.created_at.year}. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+    """
+
     text_content = f"""
-    Nouveau message de contact :
+    Dear {client_name},
 
-  
-    Email : {user_email}
+    We’ve successfully received your payment for Order #{order.id}.
+    Our team is preparing your items for shipment.
 
-    Message :
-    {user_message}
+    For any inquiries, reach out to us at gold@goldyseas.com.
+
+    — Goldy Seas Team
     """
 
-    # ✅ Version HTML stylisée
+    send_html_email(subject, order.email, html_content, text_content)
+
+
+def notify_admin_of_payment(order):
+    """
+    Notify Goldy Seas admin when a new payment is received.
+    """
+    subject = f"💰 New Payment Received – Order #{order.id}"
     html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h2>📩 Nouveau message de contact</h2>
-        <p><strong>Email :</strong> {user_email}</p>
-        <p><strong>Message :</strong></p>
-        <p style="background:#f5f5f5;padding:10px;border-left:4px solid #00bfff;">{user_message}</p>
-        <hr>
-        <p>Ce message provient du formulaire de contact de downtimenote.</p>
-    </body>
-    </html>
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb; padding: 40px;">
+      <div style="max-width: 600px; background: #ffffff; border-radius: 10px; margin: auto; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
+        <div style="background: #d4af37; padding: 15px 20px; color: white; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+          <h2 style="margin: 0;">Goldy Seas – Payment Notification</h2>
+        </div>
+        <div style="padding: 25px;">
+          <p style="color: #333;">A new payment has been recorded:</p>
+
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <tr><td style="padding: 6px 0;"><strong>Order ID:</strong></td><td>#{order.id}</td></tr>
+            <tr><td style="padding: 6px 0;"><strong>Client:</strong></td><td>{order.full_name}</td></tr>
+            <tr><td style="padding: 6px 0;"><strong>Email:</strong></td><td>{order.email}</td></tr>
+            <tr><td style="padding: 6px 0;"><strong>Amount:</strong></td><td>${order.total_amount}</td></tr>
+            <tr><td style="padding: 6px 0;"><strong>Status:</strong></td><td>{order.status}</td></tr>
+            <tr><td style="padding: 6px 0;"><strong>Date:</strong></td><td>{order.created_at.strftime('%B %d, %Y')}</td></tr>
+          </table>
+
+          <p style="margin-top: 25px; color: #555;">
+            Please log into the admin dashboard for details and next steps.
+          </p>
+
+          <p style="margin-top: 30px; color: #999; font-size: 13px; text-align: center;">
+            © Goldy Seas. Internal payment alert.
+          </p>
+        </div>
+      </div>
+    </div>
     """
 
-    msg = EmailMultiAlternatives(
-        subject=subject,
-        body=text_content,
-        from_email=from_email,
-        to=to,
-        reply_to=[user_email],  # ✅ Ici tu pourras répondre directement au visiteur
-    )
-
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
-
-
-def send_verification_email(email, code):
-  
-    
-    subject = "Verify your DowntimeNote account"
-    from_email = ""
-    to = [email]
-    text_content = f"Your verification code is: {code}"
-
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Email Verification</title>
-    </head>
-    <body style="font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f5f7fb; padding: 30px; color: #333;">
-      <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
-        <tr>
-          <td style="padding: 30px;">
-            <h1 style="color: #2c3e50; font-size: 26px; margin-bottom: 10px;">🔐 Verify your Email</h1>
-            <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              You're almost there! Use the verification code below to activate your DowntimeNote account.
-            </p>
-            <div style="font-size: 32px; font-weight: bold; background-color: #eef2ff; color: #4f46e5; padding: 15px 25px; border-radius: 8px; text-align: center; letter-spacing: 4px;">
-              {code}
-            </div>
-            <p style="font-size: 16px; line-height: 1.5; margin-top: 20px;">
-              This code will expire in 15 minutes.
-            </p>
-            <p style="font-size: 14px; color: #777; margin-top: 40px;">
-              This is an automated email. Please do not reply.
-            </p>
-            <p style="font-size: 16px; margin-top: 10px;">– The DowntimeNote Team</p>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-    """
-
-    msg = EmailMultiAlternatives(
-        subject,
-        text_content,
-        from_email,
-        to,
-    )
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
-def website_action_message(type, place):
-    """
-    .
-    """
-    subject = f"📩 Nouveau message de {type}"
-    from_email = DEFAULT_FROM_EMAIL
-    to = ["gogmongoma@gmail.com"]
-
-    # ✅ Version texte brut (fallback)
     text_content = f"""
-    Nouveau message de {type} :
+    New payment received:
 
-  
-    
+    Order #{order.id}
+    Client: {order.full_name}
+    Email: {order.email}
+    Amount: ${order.total_amount}
+    Status: {order.status}
 
-    Message :
-    {place}
+    — Goldy Seas Notification System
     """
 
-    # ✅ Version HTML stylisée
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h2>📩 Nouveau {type} contact</h2>
-   
-        <p><strong>Message :</strong></p>
-        <p style="background:#f5f5f5;padding:10px;border-left:4px solid #00bfff;">{place}</p>
-        <hr>
-        <p>nouveau {type} downtimenote.</p>
-    </body>
-    </html>
-    """
-
-    msg = EmailMultiAlternatives(
-        subject=subject,
-        body=text_content,
-        from_email=from_email,
-        to=to,
-        # reply_to=[user_email],  # ✅ Ici tu pourras répondre directement au visiteur
-    )
-
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
-def send_downtimenote_payment_email(email, amount):
-    subject = "Your Payment Receipt – DowntimeNote"
-    from_email = ""
-    to = [email]
-
-    text_content = f"Thanks for your payment of ${amount:.2f}. Your DowntimeNote subscription has been activated."
-
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>DowntimeNote Payment Confirmation</title>
-    </head>
-    <body style="font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f7f9fc; padding: 30px; color: #1f2937;">
-      <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-        <tr>
-          <td style="padding: 30px;">
-            <h1 style="color: #111827; font-size: 24px; margin-bottom: 10px;">✅ Payment Confirmed</h1>
-            <p style="font-size: 16px; margin-bottom: 20px;">
-              Hello,<br><br>
-              Your payment of <strong>${amount:.2f}</strong> has been received. Your DowntimeNote account is now active.
-            </p>
-            <div style="font-size: 26px; font-weight: bold; background-color: #e0f2fe; color: #0369a1; padding: 16px; border-radius: 8px; text-align: center;">
-              ${amount:.2f}
-            </div>
-            <p style="font-size: 15px; margin-top: 25px;">
-              You now have access to all premium monitoring features.
-            </p>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-            <p style="font-size: 14px; color: #6b7280;">
-              This is an automated email. Please do not reply.
-            </p>
-            <p style="font-size: 15px; margin-top: 10px;">– The DowntimeNote Team</p>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-    """
-
-    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    send_html_email(subject, "gold@goldyseas.com", html_content, text_content)

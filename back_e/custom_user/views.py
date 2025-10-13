@@ -12,7 +12,7 @@ from .models import UserAction,UserFeedback,ContactForm,UserVerification,Custome
 from decouple import config
 import requests
 from django.conf import settings
-from tools.client_email import welcome_notification_email,send_verification_email,website_action_message,forward_contact_message
+
 from django.utils import timezone
 from datetime import timedelta
 from tools.validators import generate_verification_code
@@ -49,7 +49,7 @@ class RegisterView(APIView):
             auth_login(request, user)
             request.session.modified = True  # 🔑 Force la session (nécessaire pour envoyer sessionid)
             #welcome mail
-            welcome_notification_email(user.email)
+            # welcome_notification_email(user.email)
 
             # Réponse
             response = Response({
@@ -107,8 +107,8 @@ class BeforeRegisterAPIView(APIView):
                 )
 
              
-                send_verification_email(email=email,code=verification_code)
-                website_action_message("New register","down time note")
+                # send_verification_email(email=email,code=verification_code)
+                # website_action_message("New register","down time note")
 
                 return Response({
                         "message" : "successfully"
@@ -221,8 +221,8 @@ class GoogleAuthView(generics.GenericAPIView):
             is_new_user = True
             auth_login(request, user)
             #welcome mail
-            welcome_notification_email(user.email)
-            website_action_message("register","back e")
+            # welcome_notification_email(user.email)
+            # website_action_message("register","back e")
 
         # ✅ Réponse + Cookie
         response = Response({
@@ -371,7 +371,7 @@ class UserFeedbackView(generics.GenericAPIView):
             UserFeedback.objects.get_or_create(
                 name = name,message=message
             )
-            forward_contact_message(f"{name } feedback",message)
+            # forward_contact_message(f"{name } feedback",message)
             return Response({
                 "message" : "Feedback submitted successfully"
             },status=status.HTTP_201_CREATED)
@@ -407,7 +407,7 @@ class ContactFormView(APIView):
             try:
                 # Send the email via Mailersend
                 # send_contact_email(user_email=user_email,user_message=user_message)
-                forward_contact_message(user_email,user_message)
+                # forward_contact_message(user_email,user_message)
                 email_send_from_contact,created = ContactForm.objects.get_or_create(email=user_email,message=user_message)
                 if created:
                     return Response({"message": "Email sent succesfully"},status=status.HTTP_200_OK)

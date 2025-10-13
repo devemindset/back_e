@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import stripe
-
+from tools.client_email import send_payment_confirmation_to_client,notify_admin_of_payment
 from orders.models import Order
 from payment.models import Payment  # ton modèle
 from custom_user.models import CustomUser  # adapte selon ton app
@@ -47,7 +47,7 @@ class CreateCheckoutSession(APIView):
                 mode="payment",
                 customer_email=order.email,
                 metadata={"order_id": str(order.id)},
-                success_url=f"{settings.FRONTEND_URL}/payment_success?session_id={{CHECKOUT_SESSION_ID}}",
+                success_url=f"{settings.FRONTEND_URL}/payment_success",
                 cancel_url=f"{settings.FRONTEND_URL}/payment_failed",
             )
 
@@ -123,3 +123,7 @@ def handle_checkout_session(session):
     order.save()
 
     print(f"💰 Paiement enregistré & Order {order_id} marqué comme payé")
+
+     # ✅ Send confirmation & admin notification
+    send_payment_confirmation_to_client(order)
+    notify_admin_of_payment(order)

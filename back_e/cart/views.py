@@ -73,12 +73,12 @@ class CartItemAPIView(APIView):
 
 class ClearCartView(APIView):
     """
-    Supprime le panier par session_id.
+    Vide le panier (supprime uniquement les CartItem liés) mais garde le Cart.
     """
     def delete(self, request, session_id):
         try:
             cart = Cart.objects.get(session_id=session_id)
-            cart.delete()  # ⚡ supprime aussi les CartItem liés via on_delete=models.CASCADE
-            return Response(status=status.HTTP_204_NO_CONTENT)  # ✅ No Content
+            cart.items.all().delete()  # ❌ supprime seulement les items
+            return Response(status=status.HTTP_204_NO_CONTENT)  # ✅ Panier vidé
         except Cart.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
