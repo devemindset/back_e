@@ -50,9 +50,9 @@ class ProductCategory(models.Model):
     description = models.TextField(blank=True)
     slug = models.SlugField(unique=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    color = models.BooleanField(default=False)
-    weight_grams = models.BooleanField(default=False)
-    size = models.BooleanField(default=False)
+    colors = models.BooleanField(default=False)
+    weight_gram = models.BooleanField(default=False)
+    sizes = models.BooleanField(default=False)
     same_category_name = models.CharField(null=True,blank=True) # The same category name
     shipping_time_usa = models.CharField(max_length=15,null=True,blank=True)
     shipping_time_europe = models.CharField(max_length=15,null=True,blank=True)

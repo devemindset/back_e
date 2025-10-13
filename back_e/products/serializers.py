@@ -70,7 +70,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'category_name', 'description', 'slug',
             'images_detail', 'created_at', 'updated_at',
-            "price", "size", "color", "weight_grams", "currencyCode",
+            "price", "sizes", "colors", "weight_gram", "currencyCode",
             "landing_video", 'category_image_landing', "landing_testimonials","same_category_name"
         ]
 
