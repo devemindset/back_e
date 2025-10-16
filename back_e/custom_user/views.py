@@ -16,7 +16,7 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from tools.validators import generate_verification_code
-
+from tools.client_email import forward_contact_message
 
 User = get_user_model()
 
@@ -407,10 +407,11 @@ class ContactFormView(APIView):
             try:
                 # Send the email via Mailersend
                 # send_contact_email(user_email=user_email,user_message=user_message)
-                # forward_contact_message(user_email,user_message)
+                forward_contact_message(user_email,user_message)
                 email_send_from_contact,created = ContactForm.objects.get_or_create(email=user_email,message=user_message)
                 if created:
                     return Response({"message": "Email sent succesfully"},status=status.HTTP_200_OK)
+
             except Exception as e:
                 print("error",str(e))
                 return Response({"error" : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

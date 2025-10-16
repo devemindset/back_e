@@ -114,3 +114,48 @@ def notify_admin_of_payment(order):
     """
 
     send_html_email(subject, "gold@goldyseas.com", html_content, text_content)
+
+def forward_contact_message(user_email, user_message):
+    """
+    Transfère un message de contact vers ton adresse support avec version HTML.
+    """
+    subject = f"📩 Nouveau message de {user_email}"
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to = ["gold@goldyseas.com",]
+
+    # ✅ Version texte brut (fallback)
+    text_content = f"""
+    Nouveau message de contact :
+
+  
+    Email : {user_email}
+
+    Message :
+    {user_message}
+    """
+
+    # ✅ Version HTML stylisée
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>📩 Nouveau message de contact</h2>
+        <p><strong>Email :</strong> {user_email}</p>
+        <p><strong>Message :</strong></p>
+        <p style="background:#f5f5f5;padding:10px;border-left:4px solid #00bfff;">{user_message}</p>
+        <hr>
+        <p>Ce message provient du formulaire de contact de downtimenote.</p>
+    </body>
+    </html>
+    """
+
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=text_content,
+        from_email=from_email,
+        to=to,
+        reply_to=[user_email],  # ✅ Ici tu pourras répondre directement au visiteur
+    )
+
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
